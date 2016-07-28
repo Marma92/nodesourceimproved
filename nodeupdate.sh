@@ -4,7 +4,7 @@
 # NodeUpdate
 # Script to install the NodeSource Node.js v6.x
 # repo onto a Debian or Ubuntu system.
-# Authors : Amram Delbaz & Dorine Niel
+# Authors : Amram Elbaz & Dorine Niel
 # Last Update : 28/07/2016
 ######################################
 
@@ -88,6 +88,12 @@ ${bold}This script need to be executed as administrator${normal}
 
 	fi
 
+}
+
+
+restart_services(){
+	pm2 restart
+	service nginx restart
 }
 
 
@@ -334,6 +340,7 @@ server_install
 
 server_setting_up
 
+restart_services
 }
 
 ## Defer setup until we have the complete script
