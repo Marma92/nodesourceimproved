@@ -6,7 +6,6 @@
 #
 
 export DEBIAN_FRONTEND=noninteractive
-SCRSUFFIX="_6.x"
 NODENAME="Node.js v6.x"
 NODEREPO="node_6.x"
 NODEPKG="nodejs"
@@ -139,22 +138,6 @@ Node.js v0.12 will cease to be actively supported ${bold}at the end of 2016${nor
     fi
 }
 
-script_deprecation_warning() {
-    if [ "X${SCRSUFFIX}" == "X" ]; then
-        print_bold \
-"                         SCRIPT DEPRECATION WARNING                         " "\
-This script, located at ${bold}https://deb.nodesource.com/setup${normal}, used to
-  install Node.js v0.10, is being deprecated and will eventually be made
-  inactive.
-
-"
-
-        echo
-        echo "Continuing in 10 seconds (press Ctrl-C to abort) ..."
-        echo
-        sleep 10
-    fi
-}
 
 node_arm6_setup() {
 	#TODO: make the link dynamic to dl the last version everytime
@@ -172,9 +155,6 @@ server_install() {
 	
 	print_status "Now installing PM2 for a best gesture of your node apps"
 	exec_cmd "npm install pm2 -g"
-	
-	
-
 }
 
 server_setting_up() {
@@ -185,6 +165,14 @@ server_setting_up() {
 	#add a barebone node.js app
 	exec_cmd "mkdir /usr/local/nodeapps/"
 	#here write the node.js file
+	echo > /usr/local/nodeapps/itworks.js "
+			var http = require('http');
+		http.createServer(function (req, res) {
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.end('Hello World\n');
+		}).listen(8080);
+		console.log('Server running at port 8080');	
+	"
 	
 	#warn that nginx settings will be overwritten
 	exec_cmd_nobail "mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old"
@@ -203,19 +191,16 @@ server_setting_up() {
 		}
 	} " 
 	
-	
-	
-	
 	#prepared nginx available-sites file for reverse proxy
 	
 	#launch our node app with pm2
+	exec_cmd_nobail "pm2 start /usr/local/nodeapps/itworks.js"
 }
 
 setup() {
 	
 script_sudo_warning
 
-script_deprecation_warning
 
 print_status "Installing the NodeSource ${NODENAME} repo..."
 
