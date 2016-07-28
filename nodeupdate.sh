@@ -67,6 +67,23 @@ exec_cmd() {
     exec_cmd_nobail "$1" || bail
 }
 
+
+script_sudo_warning() {
+	        print_bold \
+"                            WARNING!                              " "\
+${bold}This script need to be executed as administrator${normal}
+
+  ${bold}If you did not launch it as sudo, please stop the script right now${normal}.
+
+  An relaunch it as administrator.
+" 
+	echo
+        echo "Continuing in 10 seconds ... (Ctrl-C to kill)"
+        echo
+        sleep 10
+
+}
+
 node_deprecation_warning() {
     if [[ "X${NODENAME}" == "Xio.js v1.x" ||
           "X${NODENAME}" == "Xio.js v2.x" ||
@@ -143,7 +160,7 @@ node_arm6_setup() {
 
 
 
-serverinstall() {
+server_install() {
 	print_status "Installing nginx server"
 	exec_cmd "apt-get install nginx"
 	
@@ -152,9 +169,20 @@ serverinstall() {
 	
 	
 	
+	#TODO :
+	#add pm2 as a boot service 
+	#add a barebone node.js express app
+	#mv the nginx.conf for our
+	#cp prepared nginx.conf file for reverse proxy
+	#launch our node app with pm2
+	
+	
+	
 }
 
 setup() {
+	
+script_sudo_warning
 
 script_deprecation_warning
 
@@ -288,7 +316,7 @@ fi
 
 print_status "Now will install the tools you need to set up your server"
 
-serverinstall
+server_install
 
 }
 
