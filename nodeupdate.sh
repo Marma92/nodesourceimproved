@@ -1,9 +1,12 @@
 #!/bin/bash
 
-#
-# Script to install the NodeSource Node.js v6.x repo onto a
-# Debian or Ubuntu system.
-#
+######################################
+# NodeUpdate
+# Script to install the NodeSource Node.js v6.x
+# repo onto a Debian or Ubuntu system.
+# Authors : Amram Delbaz & Dorine Niel
+# Last Update : 28/07/2016
+######################################
 
 export DEBIAN_FRONTEND=noninteractive
 NODENAME="Node.js v6.x"
@@ -68,22 +71,21 @@ exec_cmd() {
 
 
 script_sudo_warning() {
-	
-	if [ "$EUID" -ne 0 ]; then 
+
+	if [ "$EUID" -ne 0 ]; then
 			print_bold \
 "                            WARNING!                              " "\
 ${bold}This script need to be executed as administrator${normal}
-
   ${bold}You did not launch it as admin, and the script will shut down in 5 seconds${normal}.
-	
+
 	relaunch it as administrator.
-" 
+"
 	echo
         echo "Closing in 5 seconds ... (Ctrl-C to kill)"
         echo
         sleep 5
         exit
-        
+
 	fi
 
 }
@@ -98,9 +100,7 @@ node_deprecation_warning() {
         print_bold \
 "                            DEPRECATED!                           " "\
 ${bold}${NODENAME} is no longer actively supported!${normal}
-
   ${bold}You will not receive security or critical stability updates${normal} for this version.
-
   You should update to a new version of Node.js as soon as possible.
 "
         echo
@@ -113,8 +113,6 @@ ${bold}${NODENAME} is no longer actively supported!${normal}
         print_bold \
 "                     NODE.JS v0.10 DEPRECATION WARNING                      " "\
 Node.js v0.10 will cease to be actively supported in ${bold}October 2016${normal}.
-
-
 "
 
         echo
@@ -127,7 +125,6 @@ Node.js v0.10 will cease to be actively supported in ${bold}October 2016${normal
         print_bold \
 "                     NODE.JS v0.12 DEPRECATION WARNING                      " "\
 Node.js v0.12 will cease to be actively supported ${bold}at the end of 2016${normal}.
-
 "
 
         echo
@@ -144,7 +141,7 @@ node_arm6_setup() {
 	print_status "Getting pre-compiled files for ARMv6 from NodeJS.org"
 	exec_cmd "wget https://nodejs.org/dist/v6.3.1/node-v6.3.1-linux-armv6l.tar.xz"
 	exec_cmd "tar xJvf ~/node-v6.3.1-linux-armv6l.tar.xz --strip=1"
-	
+
 }
 
 
@@ -152,18 +149,21 @@ node_arm6_setup() {
 server_install() {
 	print_status "Installing nginx server"
 	exec_cmd "apt-get install nginx"
-	
+
 	print_status "Now installing PM2 for a best gesture of your node apps"
 	exec_cmd "npm install pm2 -g"
 }
 
 server_setting_up() {
-		
+
 	#add pm2 as a boot service
-	sudo pm2 startup
-	
+    pm2 startup
+
 	#add a barebone node.js app
-	exec_cmd "mkdir /usr/local/nodeapps/"
+    if [ ! -d "/usr/local/nodeapps/" ];then
+        exec_cmd "mkdir /usr/local/nodeapps/"
+    fi
+
 	#here write the node.js file
 	echo > /usr/local/nodeapps/itworks.js "
 			var http = require('http');
@@ -171,16 +171,14 @@ server_setting_up() {
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			res.end('Hello World\n');
 		}).listen(8080);
-		console.log('Server running at port 8080');	
+		console.log('Server running at port 8080');
 	"
-	
+
 	#warn that nginx settings will be overwritten
 	exec_cmd_nobail "mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old"
 	echo > /etc/nginx/sites-available/default " server {
     listen 80;
-
     server_name localhost;
-
     location / {
         proxy_pass localhost:8080;
         proxy_http_version 1.1;
@@ -189,16 +187,16 @@ server_setting_up() {
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
 		}
-	} " 
-	
+	} "
+
 	#prepared nginx available-sites file for reverse proxy
-	
+
 	#launch our node app with pm2
 	exec_cmd_nobail "pm2 start /usr/local/nodeapps/itworks.js"
 }
 
 setup() {
-	
+
 script_sudo_warning
 
 
@@ -262,7 +260,7 @@ else
 	check_alt "Linux Mint"    "rafaela"  "Ubuntu" "trusty"
 	check_alt "Linux Mint"    "rebecca"  "Ubuntu" "trusty"
 	check_alt "Linux Mint"    "rosa"     "Ubuntu" "trusty"
-	check_alt "Linux Mint"    "sarah"    "Ubuntu" "xenial" 
+	check_alt "Linux Mint"    "sarah"    "Ubuntu" "xenial"
 	check_alt "LMDE"          "betsy"    "Debian" "jessie"
 	check_alt "elementaryOS"  "luna"     "Ubuntu" "precise"
 	check_alt "elementaryOS"  "freya"    "Ubuntu" "trusty"
@@ -334,10 +332,9 @@ print_status "Now will install the tools you need to set up your server"
 
 server_install
 
-server_setting_up 
+server_setting_up
 
 }
 
 ## Defer setup until we have the complete script
 setup
-
