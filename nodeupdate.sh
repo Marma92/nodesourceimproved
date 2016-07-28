@@ -69,20 +69,26 @@ exec_cmd() {
 
 
 script_sudo_warning() {
-	        print_bold \
+	
+	if [ "$EUID" -ne 0 ]; then 
+			print_bold \
 "                            WARNING!                              " "\
 ${bold}This script need to be executed as administrator${normal}
 
-  ${bold}If you did not launch it as sudo, please stop the script right now${normal}.
-
-  An relaunch it as administrator.
+  ${bold}You did not launch it as admin, and the script will shut down in 5 seconds${normal}.
+	
+	relaunch it as administrator.
 " 
 	echo
-        echo "Continuing in 10 seconds ... (Ctrl-C to kill)"
+        echo "Closing in 5 seconds ... (Ctrl-C to kill)"
         echo
-        sleep 10
+        sleep 5
+        exit
+        
+	fi
 
 }
+
 
 node_deprecation_warning() {
     if [[ "X${NODENAME}" == "Xio.js v1.x" ||
@@ -154,7 +160,7 @@ node_arm6_setup() {
 	#TODO: make the link dynamic to dl the last version everytime
 	print_status "Getting pre-compiled files for ARMv6 from NodeJS.org"
 	exec_cmd "wget https://nodejs.org/dist/v6.3.1/node-v6.3.1-linux-armv6l.tar.xz"
-	exec_cmd "tar xJvf ~/node-v6.3.1-linux-armv6l.tar.xz /usr/local --strip=1"
+	exec_cmd "tar xJvf ~/node-v6.3.1-linux-armv6l.tar.xz --strip=1"
 	
 }
 
@@ -164,20 +170,45 @@ server_install() {
 	print_status "Installing nginx server"
 	exec_cmd "apt-get install nginx"
 	
-	print_status "Now installing PM2 for a best gesture of your apps"
+	print_status "Now installing PM2 for a best gesture of your node apps"
 	exec_cmd "npm install pm2 -g"
 	
 	
+
+}
+
+server_setting_up() {
+		
+	#add pm2 as a boot service
+	sudo pm2 startup
 	
-	#TODO :
-	#add pm2 as a boot service 
-	#add a barebone node.js express app
-	#mv the nginx.conf for our
-	#cp prepared nginx.conf file for reverse proxy
+	#add a barebone node.js app
+	exec_cmd "mkdir /usr/local/nodeapps/"
+	#here write the node.js file
+	
+	#warn that nginx settings will be overwritten
+	exec_cmd_nobail "mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old"
+	echo > /etc/nginx/sites-available/default " server {
+    listen 80;
+
+    server_name localhost;
+
+    location / {
+        proxy_pass localhost:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+		}
+	} " 
+	
+	
+	
+	
+	#prepared nginx available-sites file for reverse proxy
+	
 	#launch our node app with pm2
-	
-	
-	
 }
 
 setup() {
@@ -318,7 +349,10 @@ print_status "Now will install the tools you need to set up your server"
 
 server_install
 
+server_setting_up 
+
 }
 
 ## Defer setup until we have the complete script
 setup
+
