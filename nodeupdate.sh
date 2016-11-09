@@ -2,15 +2,15 @@
 
 ######################################
 # NodeUpdate
-# Script to install the NodeSource Node.js v6.x
+# Script to install the NodeSource Node.js v7.x
 # repo onto a Debian or Ubuntu system.
 # Authors : Amram Elbaz & Dorine Niel
 # Last Update : 28/07/2016
 ######################################
 
 export DEBIAN_FRONTEND=noninteractive
-NODENAME="Node.js v6.x"
-NODEREPO="node_6.x"
+NODENAME="Node.js v7.x"
+NODEREPO="node_7.x"
 NODEPKG="nodejs"
 
 print_status() {
@@ -145,9 +145,8 @@ Node.js v0.12 will cease to be actively supported ${bold}at the end of 2016${nor
 node_arm6_setup() {
 	#TODO: make the link dynamic to dl the last version everytime
 	print_status "Getting pre-compiled files for ARMv6 from NodeJS.org"
-	exec_cmd "wget https://nodejs.org/dist/v6.3.1/node-v6.3.1-linux-armv6l.tar.xz"
-	exec_cmd "tar xJvf ~/node-v6.3.1-linux-armv6l.tar.xz --strip=1"
-
+	exec_cmd "wget https://nodejs.org/dist/v7.1.0/node-v7.1.0-linux-armv6l.tar.xz"
+	exec_cmd "tar xJvf ~/node-v7.1.0-linux-armv6l.tar.xz --strip=1"
 }
 
 
