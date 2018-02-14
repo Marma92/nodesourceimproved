@@ -9,7 +9,7 @@
 ######################################
 
 export DEBIAN_FRONTEND=noninteractive
-NODENAME="Node.js v9.x"
+NODENAME="Node.js v8.x"
 NODEREPO="node_8.x"
 NODEPKG="nodejs"
 
