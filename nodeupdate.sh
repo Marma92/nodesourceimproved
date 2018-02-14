@@ -2,15 +2,15 @@
 
 ######################################
 # NodeUpdate
-# Script to install the NodeSource Node.js v7.x
+# Script to install the NodeSource Node.js v8.x
 # repo onto a Debian or Ubuntu system.
 # Authors : Amram Elbaz & Dorine Niel
 # Last Update : 28/07/2016
 ######################################
 
 export DEBIAN_FRONTEND=noninteractive
-NODENAME="Node.js v7.x"
-NODEREPO="node_7.x"
+NODENAME="Node.js v9.x"
+NODEREPO="node_8.x"
 NODEPKG="nodejs"
 
 print_status() {
