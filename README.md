@@ -1,6 +1,6 @@
 # nodesourceimproved
-The nodesource script for installing node-js 7 improved. Including armv6 gesture and app production tools, including:
+The nodesource script for installing node-js 7 improved. Including armv6 install and app production tools, including:
 
-- nginx
+- nginx (for reverse proxy)
 
 - pm2
